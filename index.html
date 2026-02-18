@@ -76,6 +76,16 @@
       .spread-grid{grid-template-columns:1fr}
       .page-left,.page-right{min-height:auto}
     }
+
+    .info-modal{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.45);z-index:60;padding:14px}
+    .info-modal.show{display:flex}
+    .info-card{width:min(560px,100%);max-height:78vh;overflow:auto;background:linear-gradient(180deg,#ffffff,#f4f8ff);border:1px solid #d7e3ef;border-radius:16px;box-shadow:0 16px 36px rgba(30,58,95,.25);padding:14px}
+    .info-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5f9ed0}
+    .info-title{margin:6px 0 8px;font-size:22px;line-height:1.2;color:#1f3b62}
+    .info-text{font-size:14px;line-height:1.62;color:#334155;white-space:pre-line}
+    .info-list{margin:8px 0 0 16px;padding:0}
+    .info-list li{margin:6px 0;font-size:13px;color:#3f5166}
+    .info-actions{display:flex;justify-content:flex-end;margin-top:10px}
     @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -148,6 +158,30 @@ async function showFlightGateInfo(info){
 
 
 
+
+function ensureInfoModal(){
+  if(document.getElementById('info-modal')) return;
+  const el = document.createElement('div');
+  el.id = 'info-modal';
+  el.className = 'info-modal';
+  el.innerHTML = `<div class="info-card" role="dialog" aria-modal="true" aria-label="상세 정보"><div id="info-modal-body"></div><div class="info-actions"><button class="btn" onclick="closeInfoModal()">닫기</button></div></div>`;
+  el.addEventListener('click', (e)=>{ if(e.target===el) closeInfoModal(); });
+  document.body.appendChild(el);
+}
+
+function openInfoModal(html){
+  ensureInfoModal();
+  const modal = document.getElementById('info-modal');
+  const body = document.getElementById('info-modal-body');
+  body.innerHTML = html;
+  modal.classList.add('show');
+}
+
+function closeInfoModal(){
+  const modal = document.getElementById('info-modal');
+  if(modal) modal.classList.remove('show');
+}
+
 function resolveRentalInfo(metaText){
   const txt = metaText || '';
   if(!(txt.includes('렌트') || txt.includes('반납') || txt.includes('렌트카'))) return null;
@@ -200,18 +234,16 @@ function resolveCuisineInfo(metaText){
 function showCuisineInfo(metaText){
   const c = resolveCuisineInfo(metaText);
   if(!c) return;
-  const msg = [
-    `🍽 ${c.name}`,
-    '',
-    `• 설명: ${c.summary}`,
-    '',
-    '• 역사:',
-    ...c.history.map(v=>`  - ${v}`),
-    '',
-    '• 포인트:',
-    ...c.points.map(v=>`  - ${v}`)
-  ].join('\\n');
-  alert(msg);
+  const html = `
+    <div class="info-kicker">Japanese Course Culture</div>
+    <h3 class="info-title">🍽 ${c.name}</h3>
+    <div class="info-text">${c.summary}</div>
+    <div class="info-kicker" style="margin-top:10px">History</div>
+    <ul class="info-list">${c.history.map(v=>`<li>${v}</li>`).join('')}</ul>
+    <div class="info-kicker" style="margin-top:8px">Tasting Points</div>
+    <ul class="info-list">${c.points.map(v=>`<li>${v}</li>`).join('')}</ul>
+  `;
+  openInfoModal(html);
 }
 
 function resolveSpotIndex(metaText, page){
@@ -386,7 +418,7 @@ function openBook(){cover=false;render();}
 function goCover(){cover=true;render();}
 function prev(){if(i===0)return;dir='prev';i--;render();}
 function next(){if(i===pages.length-1)return;dir='next';i++;render();}
-window.openBook=openBook;window.goCover=goCover;window.prev=prev;window.next=next;window.editPage=editPage;
+window.openBook=openBook;window.goCover=goCover;window.prev=prev;window.next=next;window.editPage=editPage;window.closeInfoModal=closeInfoModal;
 render();
 </script>
 </body>
