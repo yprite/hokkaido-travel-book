@@ -3,51 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#6cbbe0" />
-  <title>HOKKAIDO · Editorial Book</title>
+  <meta name="theme-color" content="#cfd3d8" />
+  <title>SAPPORO · Editorial Book</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <style>
-    :root{--sky:#dff2ff;--fog:#f6fbff;--ink:#1f4f85;--muted:#5e84aa;--line:#c9dff3;--pri:#2f74ff}
+    :root{--bg:#d9dbe0;--paper:#ffffff;--ink:#2f3b4b;--muted:#6f7d90;--line:#e2e7ee;--pri:#5f9ed0}
     *{box-sizing:border-box}
-    html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--sky),var(--fog));}
-    .bg{position:fixed;inset:0;background:url('./theme-ref-2.jpg') center/cover no-repeat;filter:blur(16px) saturate(.9);opacity:.18;transform:scale(1.06);z-index:0;pointer-events:none}
-    .wrap{max-width:840px;margin:0 auto;padding:18px;position:relative;z-index:1}
-    .sheet{background:rgba(248,252,255,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 28px rgba(44,97,156,.12)}
+    html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+    .bg{position:fixed;inset:0;background:url('./theme-ref-3.jpg') center/cover no-repeat;filter:blur(18px) saturate(.85);opacity:.10;transform:scale(1.07);z-index:0;pointer-events:none}
+    .wrap{max-width:980px;margin:0 auto;padding:22px;position:relative;z-index:1}
 
-    .cover{overflow:hidden}
-    .cover img{width:100%;display:block;max-height:70vh;object-fit:cover}
-    .cover-body{padding:16px}
-    .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-    h1{margin:8px 0 6px;font-size:38px;line-height:1.05;font-weight:800;letter-spacing:.03em}
-    .sub{color:var(--muted);font-size:14px;line-height:1.6}
+    .book{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(20,26,38,.18)}
 
-    .btn{min-height:44px;border-radius:12px;border:1px solid var(--line);padding:10px 14px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer}
+    .cover-shell{display:grid;place-items:center;padding:26px;min-height:78vh}
+    .cover-book{width:min(520px,92%);background:#f7fbff;border-radius:8px;box-shadow:0 18px 32px rgba(0,0,0,.22);overflow:hidden;border:1px solid #d8e4f1}
+    .cover-book img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+    .cover-body{padding:16px 18px 18px}
+    .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    h1{margin:8px 0 6px;font-size:42px;line-height:1.02;letter-spacing:.02em}
+    .sub{font-size:14px;color:var(--muted)}
+
+    .btn{min-height:44px;border-radius:10px;border:1px solid var(--line);padding:10px 14px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer}
     .btn.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
     .nav{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
 
-    .page{padding:18px;transform-origin:left center}
-    .date{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-    .title{font-size:28px;line-height:1.18;margin:8px 0 10px;font-weight:800}
-    .body{font-size:16px;line-height:1.8;color:#2d5f95;white-space:pre-line}
-    .body::first-letter{font-size:2.2em;float:left;line-height:.9;margin:.06em .08em 0 0;font-weight:800;color:var(--pri)}
-    .map-wrap{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:8px;background:#eef7ff}
-    .map-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px 2px}
-    .map{height:250px;border-radius:10px;overflow:hidden;border:1px solid #bfd9ef}
-    .progress{margin-top:10px;font-size:12px;color:var(--muted);text-align:center}
+    .spread{padding:14px;position:relative;overflow:hidden}
+    .spread::before{content:'';position:absolute;inset:14px 50% 14px 50%;width:1px;background:linear-gradient(180deg,transparent,#dbe3ec 10%,#dbe3ec 90%,transparent);z-index:0}
+    .spread-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative;z-index:1}
+    .page-left,.page-right{border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;min-height:560px}
 
-    @keyframes flipNext{0%{opacity:.6;transform:perspective(1200px) rotateY(-22deg) translateX(-10px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
-    @keyframes flipPrev{0%{opacity:.6;transform:perspective(1200px) rotateY(22deg) translateX(10px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
+    .date{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .title{font-size:30px;line-height:1.1;margin:8px 0 10px;font-weight:800}
+    .body{font-size:16px;line-height:1.85;color:#3f5166;white-space:pre-line}
+    .body::first-letter{font-size:2.2em;float:left;line-height:.9;margin:.05em .08em 0 0;font-weight:800;color:#4b85b6}
+
+    .hero-shot{width:100%;height:330px;border-radius:6px;object-fit:cover;border:1px solid #d9e4f0;background:#f0f5fb}
+    .map-label{margin:10px 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .map{height:200px;border-radius:6px;overflow:hidden;border:1px solid #d7e3ef}
+    .folio{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+
+    .edit{margin-top:10px;font-size:12px;color:var(--muted)}
     .flip-next{animation:flipNext .35s ease}
     .flip-prev{animation:flipPrev .35s ease}
     .swipe-zone{touch-action:pan-y}
+
+    @keyframes flipNext{0%{opacity:.65;transform:perspective(1200px) rotateY(-16deg) translateX(-8px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
+    @keyframes flipPrev{0%{opacity:.65;transform:perspective(1200px) rotateY(16deg) translateX(8px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
+
+    @media (max-width:860px){
+      .spread{padding:12px}
+      .spread::before{display:none}
+      .spread-grid{grid-template-columns:1fr}
+      .page-left,.page-right{min-height:auto}
+      .hero-shot{height:240px}
+    }
     @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-<div class="bg" id="bg"></div>
+<div id="bg" class="bg"></div>
 <main class="wrap" id="app"></main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -56,32 +73,32 @@ let cover=true, i=0, dir='next', map=null;
 const swipe={x:0,y:0,dx:0,dy:0,a:false,lock:false};
 
 const pages=[
-  {date:'4/27 MON', title:'Arrival in White Silence', text:`신치토세 도착 후 시라오이로 이동.
-첫날은 이동과 체크인에 집중하고,
-몸의 속도를 여행 속도로 맞추는 날.`, spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
-  {date:'4/28 TUE', title:'Long Drive to Hakodate', text:`무리하지 않는 장거리 이동.
-중간중간 쉬어가며 하코다테 도착,
-저녁은 컨디션 중심으로 유동 운영.`, spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
-  {date:'4/29 WED', title:'City Day, Soft Rhythm', text:`아침시장–고료카쿠–카페–야경.
-명소 수보다 리듬 유지가 우선.
-아기 컨디션에 맞춰 즉시 축소 가능한 일정.`, spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
-  {date:'4/30 THU', title:'Onsen Transition', text:`하코다테에서 노보리베츠로 이동.
-움직임보다 회복을 택하는 날,
-온천과 휴식이 메인 테마.`, spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
-  {date:'5/1 FRI', title:'Last Page, Homebound', text:`짧게 지옥계곡을 보고 공항 이동.
-이번 여행의 핵심은
-많이 보는 것보다 무리 없이 함께 돌아오는 것.`, spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
+  {date:'4/27 MON', title:'Sapporo Arrival Tone', text:`신치토세 도착 후 시라오이로 이동.
+첫 페이지는 속도를 낮추고,
+여행 리듬을 맞추는 데 집중한다.`, hero:'./theme-ref-3.jpg', spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
+  {date:'4/28 TUE', title:'Southbound to Hakodate', text:`긴 이동일은 욕심을 줄이고,
+휴식 지점을 먼저 확보한다.
+도착 후 저녁은 컨디션 기준으로 선택.`, hero:'./theme-ref-2.jpg', spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
+  {date:'4/29 WED', title:'Hakodate Editorial Day', text:`아침시장, 고료카쿠, 카페, 야경.
+루트는 유지하되 체력에 맞춰 압축.
+가족 리듬이 가장 중요한 하루.`, hero:'./theme-ref.jpg', spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
+  {date:'4/30 THU', title:'Onsen Transfer Chapter', text:`하코다테에서 노보리베츠로 이동.
+관광보다 회복을 메인으로 두고,
+온천 중심의 느린 하루를 만든다.`, hero:'./theme-ref-3.jpg', spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
+  {date:'5/1 FRI', title:'Last Page Homebound', text:`지옥계곡을 짧게 보고 공항으로.
+이번 여정의 결론은 한 문장,
+무리 없이 함께 잘 다녀온 여행.`, hero:'./theme-ref-2.jpg', spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
 ];
 
 function render(){
   document.getElementById('bg').style.display = cover ? 'none' : 'block';
   const el=document.getElementById('app');
   if(cover){
-    el.innerHTML=`<section class="sheet cover"><img src="./theme-ref-2.jpg" alt="Hokkaido cover"/><div class="cover-body"><div class="kicker">Travel Editorial</div><h1>HOKKAIDO</h1><div class="sub">minimal winter magazine mood</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></section>`;
+    el.innerHTML=`<section class="book cover-shell"><article class="cover-book"><img src="./theme-ref-3.jpg" alt="Sapporo editorial cover"/><div class="cover-body"><div class="kicker">Sapporo Visual Journal</div><h1>SAPPORO</h1><div class="sub">book-inspired editorial layout</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></article></section>`;
     return;
   }
   const p=pages[i];
-  el.innerHTML=`<section class="sheet page ${dir==='prev'?'flip-prev':'flip-next'}"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><div class="title">${p.title}</div><div class="body">${p.text}</div></div><div class="map-wrap"><div class="map-label">Route Map</div><div id="map" class="map"></div></div><div class="progress">${i+1} / ${pages.length}</div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
+  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body">${p.text}</div></div><div class="edit">텍스트 수정: 아래 버튼 사용</div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
   bindSwipe();
   setTimeout(drawMap,0);
 }
@@ -100,11 +117,11 @@ function drawMap(){
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
   const ll=p.spots.map(s=>[s[1],s[2]]);
   p.spots.forEach((s,idx)=>{
-    const icon=L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:#2f74ff;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 12px Inter">${idx+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]});
+    const icon=L.divIcon({className:'',html:`<div style="width:25px;height:25px;border-radius:50%;background:#5f9ed0;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 12px Inter">${idx+1}</div>`,iconSize:[25,25],iconAnchor:[12.5,12.5]});
     L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(`<b>${idx+1}. ${s[0]}</b>`);
   });
-  if(ll.length>1) L.polyline(ll,{color:'#2f74ff',weight:4,opacity:.9}).addTo(map);
-  map.fitBounds(L.latLngBounds(ll),{padding:[22,22]});
+  if(ll.length>1) L.polyline(ll,{color:'#5f9ed0',weight:4,opacity:.9}).addTo(map);
+  map.fitBounds(L.latLngBounds(ll),{padding:[20,20]});
 }
 
 function bindSwipe(){
