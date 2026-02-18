@@ -13,7 +13,7 @@
     :root{--bg:#d9dbe0;--paper:#ffffff;--ink:#2f3b4b;--muted:#6f7d90;--line:#e2e7ee;--pri:#5f9ed0}
     *{box-sizing:border-box}
     html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
-    .bg{position:fixed;inset:0;background:url('./sapporo-skyline.jpg') center/cover no-repeat;filter:blur(18px) saturate(.85);opacity:.10;transform:scale(1.07);z-index:0;pointer-events:none}
+    .bg{position:fixed;inset:0;background:url('./sapporo-retro-main.jpg') center/cover no-repeat;filter:blur(18px) saturate(.85);opacity:.10;transform:scale(1.07);z-index:0;pointer-events:none}
     .wrap{max-width:980px;margin:0 auto;padding:22px;position:relative;z-index:1}
 
     .book{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(20,26,38,.18)}
@@ -75,26 +75,26 @@ const swipe={x:0,y:0,dx:0,dy:0,a:false,lock:false};
 const pages=[
   {date:'4/27 MON', title:'Sapporo Arrival Tone', text:`신치토세 도착 후 시라오이로 이동.
 첫 페이지는 속도를 낮추고,
-여행 리듬을 맞추는 데 집중한다.`, hero:'./sapporo-skyline.jpg', spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
+여행 리듬을 맞추는 데 집중한다.`, hero:'./sapporo-retro-main.jpg', spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
   {date:'4/28 TUE', title:'Southbound to Hakodate', text:`긴 이동일은 욕심을 줄이고,
 휴식 지점을 먼저 확보한다.
-도착 후 저녁은 컨디션 기준으로 선택.`, hero:'./sapporo-odori.jpg', spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
+도착 후 저녁은 컨디션 기준으로 선택.`, hero:'./sapporo-retro-main.jpg', spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
   {date:'4/29 WED', title:'Hakodate Editorial Day', text:`아침시장, 고료카쿠, 카페, 야경.
 루트는 유지하되 체력에 맞춰 압축.
-가족 리듬이 가장 중요한 하루.`, hero:'./sapporo-clock-tower.jpg', spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
+가족 리듬이 가장 중요한 하루.`, hero:'./sapporo-retro-main.jpg', spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
   {date:'4/30 THU', title:'Onsen Transfer Chapter', text:`하코다테에서 노보리베츠로 이동.
 관광보다 회복을 메인으로 두고,
-온천 중심의 느린 하루를 만든다.`, hero:'./sapporo-gov-office.jpg', spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
+온천 중심의 느린 하루를 만든다.`, hero:'./sapporo-retro-main.jpg', spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
   {date:'5/1 FRI', title:'Last Page Homebound', text:`지옥계곡을 짧게 보고 공항으로.
 이번 여정의 결론은 한 문장,
-무리 없이 함께 잘 다녀온 여행.`, hero:'./sapporo-susukino-night.jpg', spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
+무리 없이 함께 잘 다녀온 여행.`, hero:'./sapporo-retro-main.jpg', spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
 ];
 
 function render(){
   document.getElementById('bg').style.display = cover ? 'none' : 'block';
   const el=document.getElementById('app');
   if(cover){
-    el.innerHTML=`<section class="book cover-shell"><article class="cover-book"><img src="./sapporo-skyline.jpg" alt="Sapporo editorial cover"/><div class="cover-body"><div class="kicker">Sapporo Visual Journal</div><h1>SAPPORO</h1><div class="sub">book-inspired editorial layout</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></article></section>`;
+    el.innerHTML=`<section class="book cover-shell"><article class="cover-book"><img src="./sapporo-retro-main.jpg" alt="Sapporo editorial cover"/><div class="cover-body"><div class="kicker">Sapporo Visual Journal</div><h1>SAPPORO</h1><div class="sub">book-inspired editorial layout</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></article></section>`;
     return;
   }
   const p=pages[i];
