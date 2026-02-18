@@ -3,447 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#c96ea2" />
-  <title>Hokkaido Travel Book</title>
+  <meta name="theme-color" content="#6cbbe0" />
+  <title>HOKKAIDO · Editorial Book</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <style>
-    :root{--bg:#d6efff;--bg2:#f2f8ff;--paper:#f8fbff;--paper-edge:#eef5ff;--line:#c7d9ee;--text:#1f3f6a;--muted:#5b7da5;--pri:#2f74ff;--sec:#7ec8f0}
+    :root{--sky:#dff2ff;--fog:#f6fbff;--ink:#1f4f85;--muted:#5e84aa;--line:#c9dff3;--pri:#2f74ff}
     *{box-sizing:border-box}
-    html,body{margin:0;background:radial-gradient(circle at 20% 0%,var(--bg),var(--bg2));color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
-    body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");z-index:0}
-    .wrap{max-width:900px;margin:0 auto;padding:16px;position:relative;z-index:1}
-    .bg-cover-blur{position:fixed;inset:0;background-image:url('./theme-ref-2.jpg');background-size:cover;background-position:center;filter:blur(14px) saturate(.95);transform:scale(1.06);opacity:.24;z-index:0;pointer-events:none}
-    .bg-cover-blur.hidden{display:none}
-    .bg-cover-blur::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,248,239,.35),rgba(247,231,212,.55))}
-    .book-cover,.book-page{background:linear-gradient(180deg,var(--paper),var(--paper-edge));border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 16px rgba(70,45,25,.08)}
-    .book-cover{overflow:hidden}
-    .book-cover img{display:block;width:100%;max-height:72vh;object-fit:cover}
-    .cover-caption{padding:14px}
-    .title{font-family:Inter,sans-serif;font-size:34px;font-weight:800;letter-spacing:.04em;margin:0 0 6px;text-transform:uppercase}
-    .subtitle{color:var(--muted);font-size:14px;line-height:1.55}
-    .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:11px 14px;font-size:14px;cursor:pointer;min-height:44px}
-    .btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
-    .btn:disabled{opacity:.45;cursor:not-allowed}
-    .page{padding:20px}
-    .swipe-zone{border-radius:10px}
-    .date{font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.14em;text-transform:uppercase}
-    .chapter{font-family:'Noto Serif KR',serif;font-size:24px;line-height:1.25;margin:0 0 8px}
-    .body{line-height:1.78;color:#2b3f5a;font-size:16px;white-space:pre-line}
-    .body::first-letter{font-family:'Noto Serif KR',serif;font-size:2.4em;line-height:.9;float:left;margin:.06em .08em 0 0;color:#2f74ff}
-    .map-wrap{margin:14px 0;padding:8px;background:#edf6ff;border:1px solid #c7d9ee;border-radius:14px;box-shadow:0 6px 18px rgba(67,120,180,.14)}
-    .map-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#5378a3;margin:0 0 6px 2px}
-    .map{width:100%;height:250px;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0}
-    .tagline{display:inline-block;margin:0 0 8px;padding:4px 9px;border-radius:999px;border:1px solid #c7d9ee;background:#f3f9ff;color:#2f74ff;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-    .edit-grid{display:grid;gap:8px;margin:8px 0}
-    .input,.textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;color:var(--text)}
-    .textarea{min-height:120px;resize:vertical;line-height:1.6}
-    .details-wrap{margin-top:12px}
-    .details-scroll{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;border-radius:12px}
-    .details-scroll::-webkit-scrollbar{display:none}
-    .detail-card{min-width:100%;max-width:100%;border:1px dashed var(--line);border-radius:12px;padding:14px;background:linear-gradient(180deg,#fffdf9,#fff7ee);scroll-snap-align:start;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
-    .detail-card h3{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2b3f5a}
-    .detail-card ul{margin:0;padding-left:20px}
-    .detail-card li{margin:8px 0;line-height:1.5}
-    .spot-row{padding:8px;border:1px solid var(--line);border-radius:10px;background:#fff}
-    .spot-name{font-weight:600;color:#24374f;margin-bottom:6px}
-    .spot-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .pill-link{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;text-decoration:none;color:#2b3f5a;font-size:12px;min-height:32px}
-    .pill-link.pri{background:var(--pri);border-color:var(--pri);color:#fff}
-    .pill-link.soft{background:#eef5fb;border-color:#d6e6f4;color:#2e7aa9}
-    .details-status{margin-top:8px}
-    .details-bar{height:6px;border-radius:999px;background:#eadfce;overflow:hidden}
-    .details-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sec),var(--pri));transition:width .2s ease}
-    .details-label{margin-top:4px;font-size:12px;color:var(--muted);text-align:center}
-    .book-nav{display:flex;gap:8px;margin-top:16px}
-    .book-nav .btn{flex:1}
-    .small{font-size:13px;color:var(--muted);margin-top:8px}
-    .book-page{transform-origin:left center;backface-visibility:hidden;touch-action:pan-y}
-    @keyframes pageFlipNext{0%{opacity:.6;transform:perspective(1200px) rotateY(-24deg) translateX(-12px)}100%{opacity:1;transform:perspective(1200px) rotateY(0deg) translateX(0)}}
-    @keyframes pageFlipPrev{0%{opacity:.6;transform:perspective(1200px) rotateY(24deg) translateX(12px)}100%{opacity:1;transform:perspective(1200px) rotateY(0deg) translateX(0)}}
-    .book-page.flip-next{animation:pageFlipNext .35s ease}
-    .book-page.flip-prev{animation:pageFlipPrev .35s ease}
+    html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--sky),var(--fog));}
+    .bg{position:fixed;inset:0;background:url('./theme-ref-2.jpg') center/cover no-repeat;filter:blur(16px) saturate(.9);opacity:.18;transform:scale(1.06);z-index:0;pointer-events:none}
+    .wrap{max-width:840px;margin:0 auto;padding:18px;position:relative;z-index:1}
+    .sheet{background:rgba(248,252,255,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 28px rgba(44,97,156,.12)}
+
+    .cover{overflow:hidden}
+    .cover img{width:100%;display:block;max-height:70vh;object-fit:cover}
+    .cover-body{padding:16px}
+    .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    h1{margin:8px 0 6px;font-size:38px;line-height:1.05;font-weight:800;letter-spacing:.03em}
+    .sub{color:var(--muted);font-size:14px;line-height:1.6}
+
+    .btn{min-height:44px;border-radius:12px;border:1px solid var(--line);padding:10px 14px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer}
+    .btn.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+    .nav{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+
+    .page{padding:18px;transform-origin:left center}
+    .date{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+    .title{font-size:28px;line-height:1.18;margin:8px 0 10px;font-weight:800}
+    .body{font-size:16px;line-height:1.8;color:#2d5f95;white-space:pre-line}
+    .body::first-letter{font-size:2.2em;float:left;line-height:.9;margin:.06em .08em 0 0;font-weight:800;color:var(--pri)}
+    .map-wrap{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:8px;background:#eef7ff}
+    .map-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px 2px}
+    .map{height:250px;border-radius:10px;overflow:hidden;border:1px solid #bfd9ef}
+    .progress{margin-top:10px;font-size:12px;color:var(--muted);text-align:center}
+
+    @keyframes flipNext{0%{opacity:.6;transform:perspective(1200px) rotateY(-22deg) translateX(-10px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
+    @keyframes flipPrev{0%{opacity:.6;transform:perspective(1200px) rotateY(22deg) translateX(10px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
+    .flip-next{animation:flipNext .35s ease}
+    .flip-prev{animation:flipPrev .35s ease}
+    .swipe-zone{touch-action:pan-y}
     @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-  <div id="bg-cover-blur" class="bg-cover-blur hidden" aria-hidden="true"></div>
-  <main class="wrap" id="content"></main>
+<div class="bg" id="bg"></div>
+<main class="wrap" id="app"></main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-(async function clearPwaCache(){
-  if('serviceWorker' in navigator){
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for(const r of regs) await r.unregister();
-  }
-  if('caches' in window){
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k=>caches.delete(k)));
-  }
-})();
+let cover=true, i=0, dir='next', map=null;
+const swipe={x:0,y:0,dx:0,dy:0,a:false,lock:false};
 
-let showCover = true;
-let currentPage = 0;
-let flipDir = 'next';
-let currentMap = null;
-let isEditing = false;
-const PAGE_STORE_KEY = 'hokkaido-book-pages-v1';
-let detailsAutoTimer = null;
-
-const swipeState = {
-  startX: 0,
-  startY: 0,
-  dx: 0,
-  dy: 0,
-  active: false,
-  locked: false
-};
-
-const pages = [
-  {
-    date:'4/27(월)',
-    chapter:'Chapter 1. 설원의 도착',
-    text:`인천에서 출발한 비행기는 오후의 빛을 따라 신치토세에 내려앉는다.
-렌터카를 찾아 시라오이로 향하는 길, 창밖은 점점 하얗고 고요해진다.
-오늘은 멀리 가지 않는다. 천천히, 여행의 온도를 맞추는 날.`,
-    details:['KE769 12:35-15:20', '렌트카 픽업 15:30', '카이 포로토 체크인 & 디너'],
-    spots:[
-      {name:'New Chitose Airport (CTS)',lat:42.7752,lng:141.6923},
-      {name:'Hoshino Resorts KAI Poroto',lat:42.5513,lng:141.3577}
-    ]
-  },
-  {
-    date:'4/28(화)',
-    chapter:'Chapter 2. 남쪽으로 내려가는 길',
-    text:`시라오이에서 하코다테까지는 긴 호흡의 이동이다.
-급하게 체크리스트를 지우기보다, 쉬고 풍경을 보는 날.
-아카렌카 창고에 닿으면 도시의 결이 달라진다.`,
-    details:['체크아웃 12:00', '장거리 이동(약 3~4시간)', '숙소 체크인 후 저녁 유동 운영'],
-    spots:[
-      {name:'KAI Poroto',lat:42.5513,lng:141.3577},
-      {name:'Kanemori Red Brick Warehouse',lat:41.7674,lng:140.7147},
-      {name:'Chikuba Shinyotei Ryokan',lat:41.7803,lng:140.7875}
-    ]
-  },
-  {
-    date:'4/29(수)',
-    chapter:'Chapter 3. 하코다테의 하루',
-    text:`아침시장부터 고료카쿠, 카페, 하치만자카와 야경까지.
-많이 보기보다 리듬을 지키는 게 핵심.
-하루의 완성은 명소 개수가 아니라, 모두가 덜 지친 얼굴로 돌아오는 것.`,
-    details:['아침시장 → 고료카쿠 중심', '카페에서 낮잠 타임 확보', '야경은 컨디션 보고 결정'],
-    spots:[
-      {name:'Hakodate Morning Market',lat:41.7736,lng:140.7275},
-      {name:'Goryokaku Park',lat:41.7968,lng:140.7575},
-      {name:'Hachimanzaka Slope',lat:41.7657,lng:140.7100},
-      {name:'Mt. Hakodate Ropeway',lat:41.7592,lng:140.7030}
-    ]
-  },
-  {
-    date:'4/30(목)',
-    chapter:'Chapter 4. 온천으로 넘어가는 페이지',
-    text:`하코다테의 아침을 가볍게 마무리하고 노보리베츠로 이동.
-길 위에서 욕심을 덜면, 도착 후의 시간이 길어진다.
-오늘은 움직임보다 회복의 날.`,
-    details:['체크아웃 11:00', '점심 후 노보리베츠 이동', '온천 & 휴식 중심 운영'],
-    spots:[
-      {name:'Uni Murakami Hakodate Honten',lat:41.7733,lng:140.7258},
-      {name:'Noboribetsu Hanayura',lat:42.4987,lng:141.1446}
-    ]
-  },
-  {
-    date:'5/1(금)',
-    chapter:'Chapter 5. 귀국 전의 숨',
-    text:`체크아웃 후 지옥계곡을 짧게 걷고 공항으로 향한다.
-마지막 날은 항상 가장 빨리 지나간다.
-이번 여행의 목표는 ‘많이 본 것’이 아니라 ‘함께 무리 없이 잘 다녀온 것’.`,
-    details:['체크아웃 10:00', '지옥계곡 짧은 산책', '공항 반납 후 KE766 15:05-18:10'],
-    spots:[
-      {name:'Noboribetsu Hanayura',lat:42.4987,lng:141.1446},
-      {name:'Noboribetsu Jigokudani',lat:42.4973,lng:141.1428},
-      {name:'New Chitose Airport (CTS)',lat:42.7752,lng:141.6923}
-    ]
-  }
+const pages=[
+  {date:'4/27 MON', title:'Arrival in White Silence', text:`신치토세 도착 후 시라오이로 이동.
+첫날은 이동과 체크인에 집중하고,
+몸의 속도를 여행 속도로 맞추는 날.`, spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
+  {date:'4/28 TUE', title:'Long Drive to Hakodate', text:`무리하지 않는 장거리 이동.
+중간중간 쉬어가며 하코다테 도착,
+저녁은 컨디션 중심으로 유동 운영.`, spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
+  {date:'4/29 WED', title:'City Day, Soft Rhythm', text:`아침시장–고료카쿠–카페–야경.
+명소 수보다 리듬 유지가 우선.
+아기 컨디션에 맞춰 즉시 축소 가능한 일정.`, spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
+  {date:'4/30 THU', title:'Onsen Transition', text:`하코다테에서 노보리베츠로 이동.
+움직임보다 회복을 택하는 날,
+온천과 휴식이 메인 테마.`, spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
+  {date:'5/1 FRI', title:'Last Page, Homebound', text:`짧게 지옥계곡을 보고 공항 이동.
+이번 여행의 핵심은
+많이 보는 것보다 무리 없이 함께 돌아오는 것.`, spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
 ];
 
-function loadEdits(){
-  try{
-    const raw = localStorage.getItem(PAGE_STORE_KEY);
-    if(!raw) return;
-    const saved = JSON.parse(raw);
-    saved.forEach((s,idx)=>{
-      if(!pages[idx] || typeof s !== 'object') return;
-      if(typeof s.chapter === 'string') pages[idx].chapter = s.chapter;
-      if(typeof s.text === 'string') pages[idx].text = s.text;
-      if(Array.isArray(s.details)) pages[idx].details = s.details;
-    });
-  }catch{}
-}
-
-function persistEdits(){
-  const payload = pages.map(p=>({chapter:p.chapter,text:p.text,details:p.details||[]}));
-  localStorage.setItem(PAGE_STORE_KEY, JSON.stringify(payload));
-}
-
-function renderDetails(page){
-  const details = (page.details && page.details.length ? page.details : ['상세 항목 없음'])
-    .map(d=>`<li>📝 ${d}</li>`).join('');
-
-  const spots = page.spots.map((s,idx)=>{
-    const nav = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving`;
-    const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name)}`;
-    return `<li class="spot-row"><div class="spot-name">📍 ${idx+1}. ${s.name}</div><div class="spot-actions"><a class="pill-link pri" href="${nav}" target="_blank">🚗 네비 시작</a><a class="pill-link soft" href="${map}" target="_blank">🗺 지도 보기</a></div></li>`;
-  }).join('');
-
-  const center = page.spots?.[0] || {lat:42.7752,lng:141.6923,name:'현재 동선 중심'};
-  const nearby = [
-    {emoji:'🏪',label:'편의점',q:'convenience store near ' + center.name},
-    {emoji:'🚻',label:'화장실',q:'public toilet near ' + center.name},
-    {emoji:'☕',label:'카페',q:'cafe near ' + center.name},
-    {emoji:'🍼',label:'아기용품',q:'baby supplies near ' + center.name},
-    {emoji:'⛽',label:'주유소',q:'gas station near ' + center.name}
-  ].map(n=>`<li>${n.emoji} <a class="pill-link" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.q)}">${n.label} 찾기</a></li>`).join('');
-
-  const restaurants = [
-    {emoji:'🍣',label:'일식 맛집',q:'best japanese restaurant near ' + center.name},
-    {emoji:'🍜',label:'라멘',q:'ramen near ' + center.name},
-    {emoji:'🦀',label:'해산물',q:'seafood restaurant near ' + center.name},
-    {emoji:'🥩',label:'징기스칸',q:'jingisukan near ' + center.name},
-    {emoji:'🍰',label:'디저트/베이커리',q:'dessert bakery near ' + center.name}
-  ].map(n=>`<li>${n.emoji} <a class="pill-link soft" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.q)}">${n.label} 찾기</a></li>`).join('');
-
-  return `
-    <section class="details-wrap" aria-label="상세 정보 가로 스크롤">
-      <div id="details-scroll" class="details-scroll">
-        <article class="detail-card" data-card-index="0">
-          <h3>📚 오늘의 상세 정보</h3>
-          <ul>${details}</ul>
-        </article>
-        <article class="detail-card" data-card-index="1">
-          <h3>🧭 방문 포인트</h3>
-          <ul>${spots}</ul>
-        </article>
-        <article class="detail-card" data-card-index="2">
-          <h3>🧷 주변 편의시설</h3>
-          <ul>${nearby}</ul>
-        </article>
-        <article class="detail-card" data-card-index="3">
-          <h3>🍽️ 주변 맛집</h3>
-          <ul>${restaurants}</ul>
-        </article>
-      </div>
-      <div class="details-status" aria-live="polite">
-        <div class="details-bar"><i id="details-bar-fill"></i></div>
-        <div id="details-label" class="details-label">1 / 4 카드</div>
-      </div>
-    </section>`;
-}
-
 function render(){
-  const root = document.getElementById('content');
-  const bg = document.getElementById('bg-cover-blur');
-  if(bg) bg.classList.toggle('hidden', showCover);
-  if(detailsAutoTimer){ clearInterval(detailsAutoTimer); detailsAutoTimer = null; }
-  if(showCover){ 
-    root.innerHTML = `
-      <section class="book-cover">
-        <img src="./theme-ref-2.jpg" alt="여행 책 표지"/>
-        <div class="cover-caption">
-          <h1 class="title">Hokkaido Travel Book</h1>
-          <div class="subtitle">페이지를 넘기면 날짜별 이야기와 동선 지도가 함께 펼쳐진다.</div>
-          <div class="book-nav" style="margin-top:12px">
-            <button class="btn pri" onclick="startBook()" aria-label="책 펼치기">책 펼치기</button>
-          </div>
-        </div>
-      </section>`;
+  document.getElementById('bg').style.display = cover ? 'none' : 'block';
+  const el=document.getElementById('app');
+  if(cover){
+    el.innerHTML=`<section class="sheet cover"><img src="./theme-ref-2.jpg" alt="Hokkaido cover"/><div class="cover-body"><div class="kicker">Travel Editorial</div><h1>HOKKAIDO</h1><div class="sub">minimal winter magazine mood</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></section>`;
     return;
   }
-
-  const page = pages[currentPage];
-  const flipClass = flipDir === 'prev' ? 'flip-prev' : 'flip-next';
-  const detailsText = (page.details||[]).join('\n');
-  root.innerHTML = `
-    <section class="book-page ${flipClass}">
-      <div class="page">
-        <div id="swipe-zone" class="swipe-zone" aria-label="페이지 전환 제스처 영역">
-          <div class="date">${page.date}</div>
-          <div class="tagline">Hokkaido Editorial Route</div>
-          ${isEditing ? `
-            <div class="edit-grid">
-              <input id="edit-chapter" class="input" value="${page.chapter.replace(/"/g,'&quot;')}" />
-              <textarea id="edit-text" class="textarea">${page.text}</textarea>
-              <textarea id="edit-details" class="textarea" placeholder="상세정보 한 줄씩 입력">${detailsText}</textarea>
-              <button class="btn pri" onclick="saveCurrentPageEdits()">이 페이지 저장</button>
-            </div>
-          ` : `
-            <h2 class="chapter">${page.chapter}</h2>
-            <div class="body">${page.text}</div>
-          `}
-        </div>
-        <div class="map-wrap">
-          <div class="map-title">Route Map · Day ${currentPage + 1}</div>
-          <div id="map" class="map" aria-label="${page.date} 동선 지도"></div>
-        </div>
-        ${renderDetails(page)}
-        <div class="small">${currentPage + 1} / ${pages.length} 페이지</div>
-        <div class="book-nav">
-          <button class="btn" onclick="${currentPage===0?'goCover()':'prevPage()'}" aria-label="${currentPage===0?'책 타이틀로 이동':'이전 페이지'}">${currentPage===0?'← 책 타이틀':'← 이전 페이지'}</button>
-          <button class="btn" onclick="toggleEdit()" aria-label="제목/설명 수정">${isEditing ? '편집 완료' : '제목/설명 수정'}</button>
-          <button class="btn pri" onclick="nextPage()" ${currentPage===pages.length-1?'disabled':''} aria-label="다음 페이지">다음 페이지 →</button>
-        </div>
-      </div>
-    </section>`;
-  bindSwipeGesture();
-  setTimeout(mountMap, 0);
-  setTimeout(bindDetailsCarousel, 0);
+  const p=pages[i];
+  el.innerHTML=`<section class="sheet page ${dir==='prev'?'flip-prev':'flip-next'}"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><div class="title">${p.title}</div><div class="body">${p.text}</div></div><div class="map-wrap"><div class="map-label">Route Map</div><div id="map" class="map"></div></div><div class="progress">${i+1} / ${pages.length}</div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
+  bindSwipe();
+  setTimeout(drawMap,0);
 }
 
-function bindDetailsCarousel(){
-  if(detailsAutoTimer){ clearInterval(detailsAutoTimer); detailsAutoTimer = null; }
-  const scroller = document.getElementById('details-scroll');
-  const bar = document.getElementById('details-bar-fill');
-  const label = document.getElementById('details-label');
-  if(!scroller || !bar || !label) return;
-
-  const total = scroller.querySelectorAll('.detail-card').length || 1;
-
-  function getIndex(){
-    const width = scroller.clientWidth || 1;
-    return Math.max(0, Math.min(total-1, Math.round(scroller.scrollLeft / width)));
-  }
-
-  function updateStatus(){
-    const idx = getIndex();
-    const pct = ((idx + 1) / total) * 100;
-    bar.style.width = `${pct}%`;
-    label.textContent = `${idx + 1} / ${total} 카드`;
-  }
-
-  function scrollToIndex(idx){
-    const width = scroller.clientWidth || 1;
-    scroller.scrollTo({left: width * idx, behavior:'smooth'});
-  }
-
-  scroller.addEventListener('scroll', updateStatus, {passive:true});
-  updateStatus();
-
-  detailsAutoTimer = setInterval(()=>{
-    const idx = getIndex();
-    const next = (idx + 1) % total;
-    scrollToIndex(next);
-  }, 5200);
-}
-
-function bindSwipeGesture(){
-  const pageEl = document.getElementById('swipe-zone');
-  if(!pageEl) return;
-
-  pageEl.addEventListener('touchstart', onTouchStart, {passive:true});
-  pageEl.addEventListener('touchmove', onTouchMove, {passive:true});
-  pageEl.addEventListener('touchend', onTouchEnd, {passive:true});
-  pageEl.addEventListener('touchcancel', resetSwipeState, {passive:true});
-}
-
-function onTouchStart(e){
-  if(showCover || isEditing) return;
-  if(!e.touches || e.touches.length !== 1){ resetSwipeState(); return; }
-  const t = e.touches[0];
-  swipeState.startX = t.clientX;
-  swipeState.startY = t.clientY;
-  swipeState.dx = 0;
-  swipeState.dy = 0;
-  swipeState.active = true;
-  swipeState.locked = false;
-}
-
-function onTouchMove(e){
-  if(!swipeState.active || !e.touches || e.touches.length !== 1) return;
-  const t = e.touches[0];
-  swipeState.dx = t.clientX - swipeState.startX;
-  swipeState.dy = t.clientY - swipeState.startY;
-
-  // 수직 스크롤/기타 제스처는 무시
-  if(Math.abs(swipeState.dy) > Math.abs(swipeState.dx)) swipeState.locked = true;
-}
-
-function onTouchEnd(){
-  if(!swipeState.active) return;
-
-  const absX = Math.abs(swipeState.dx);
-  const absY = Math.abs(swipeState.dy);
-  const MIN_SWIPE_X = 56;
-  const MAX_SWIPE_Y = 42;
-
-  // 다른 이벤트(짧은 터치/수직/대각선/멀티터치)는 무시
-  if(!swipeState.locked && absX >= MIN_SWIPE_X && absY <= MAX_SWIPE_Y){
-    if(swipeState.dx < 0) nextPage();
-    else prevPage();
-  }
-
-  resetSwipeState();
-}
-
-function resetSwipeState(){
-  swipeState.startX = 0;
-  swipeState.startY = 0;
-  swipeState.dx = 0;
-  swipeState.dy = 0;
-  swipeState.active = false;
-  swipeState.locked = false;
-}
-
-function mountMap(){
-  const page = pages[currentPage];
-  if(currentMap){ currentMap.remove(); currentMap = null; }
-  const mapEl = document.getElementById('map');
-  if(!mapEl || !page?.spots?.length) return;
-
-  const map = L.map(mapEl,{zoomControl:true});
-  currentMap = map;
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
-
-  const latlngs = page.spots.map(s=>[s.lat,s.lng]);
-  page.spots.forEach((s,idx)=>{
-    const num = idx+1;
-    const icon = L.divIcon({className:'',html:`<div style="width:28px;height:28px;border-radius:50%;background:#2e7aa9;border:2px solid #fff;color:#fff;font:700 12px Inter;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px rgba(46,122,169,.35)">${num}</div>`,iconSize:[28,28],iconAnchor:[14,14]});
-    const nav = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving`;
-    L.marker([s.lat,s.lng],{icon}).addTo(map).bindPopup(`<b>${num}. ${s.name}</b><br><a href="${nav}" target="_blank">네비 시작</a>`);
-  });
-
-  if(latlngs.length>=2) L.polyline(latlngs,{color:'#2e7aa9',weight:4,opacity:.92}).addTo(map);
-  map.fitBounds(L.latLngBounds(latlngs),{padding:[24,24]});
-}
-
-function toggleEdit(){ isEditing = !isEditing; render(); }
-
-function saveCurrentPageEdits(){
-  const chapter = document.getElementById('edit-chapter')?.value?.trim();
-  const text = document.getElementById('edit-text')?.value?.trim();
-  const detailsRaw = document.getElementById('edit-details')?.value || '';
-  if(chapter) pages[currentPage].chapter = chapter;
-  if(text) pages[currentPage].text = text;
-  pages[currentPage].details = detailsRaw.split('\n').map(v=>v.trim()).filter(Boolean);
-  persistEdits();
-  isEditing = false;
+function editPage(){
+  const p=pages[i];
+  const t=prompt('제목 수정',p.title); if(t!==null&&t.trim()) p.title=t.trim();
+  const b=prompt('설명 수정',p.text.replace(/\n/g,' / ')); if(b!==null&&b.trim()) p.text=b.split(' / ').join('\n').trim();
   render();
 }
 
-function startBook(){ showCover = false; render(); }
-function goCover(){ showCover = true; isEditing = false; render(); }
-function prevPage(){ if(currentPage===0) return; flipDir='prev'; isEditing=false; currentPage--; render(); }
-function nextPage(){ if(currentPage===pages.length-1) return; flipDir='next'; isEditing=false; currentPage++; render(); }
+function drawMap(){
+  if(map){map.remove();map=null;}
+  const p=pages[i], m=document.getElementById('map'); if(!m) return;
+  map=L.map(m,{zoomControl:true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
+  const ll=p.spots.map(s=>[s[1],s[2]]);
+  p.spots.forEach((s,idx)=>{
+    const icon=L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:#2f74ff;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 12px Inter">${idx+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]});
+    L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(`<b>${idx+1}. ${s[0]}</b>`);
+  });
+  if(ll.length>1) L.polyline(ll,{color:'#2f74ff',weight:4,opacity:.9}).addTo(map);
+  map.fitBounds(L.latLngBounds(ll),{padding:[22,22]});
+}
 
-window.toggleEdit = toggleEdit;
-window.saveCurrentPageEdits = saveCurrentPageEdits;
-window.startBook = startBook;
-window.goCover = goCover;
-window.prevPage = prevPage;
-window.nextPage = nextPage;
+function bindSwipe(){
+  const z=document.getElementById('swipe'); if(!z) return;
+  z.addEventListener('touchstart',e=>{if(!e.touches||e.touches.length!==1)return;const t=e.touches[0];swipe.x=t.clientX;swipe.y=t.clientY;swipe.dx=0;swipe.dy=0;swipe.a=true;swipe.lock=false;},{passive:true});
+  z.addEventListener('touchmove',e=>{if(!swipe.a||!e.touches||e.touches.length!==1)return;const t=e.touches[0];swipe.dx=t.clientX-swipe.x;swipe.dy=t.clientY-swipe.y;if(Math.abs(swipe.dy)>Math.abs(swipe.dx))swipe.lock=true;},{passive:true});
+  z.addEventListener('touchend',()=>{if(!swipe.a)return;const ax=Math.abs(swipe.dx), ay=Math.abs(swipe.dy);if(!swipe.lock&&ax>=56&&ay<=42){swipe.dx<0?next():prev();}swipe.a=false;},{passive:true});
+}
 
-loadEdits();
+function openBook(){cover=false;render();}
+function goCover(){cover=true;render();}
+function prev(){if(i===0)return;dir='prev';i--;render();}
+function next(){if(i===pages.length-1)return;dir='next';i++;render();}
+window.openBook=openBook;window.goCover=goCover;window.prev=prev;window.next=next;window.editPage=editPage;
 render();
 </script>
 </body>
