@@ -12,9 +12,9 @@
   <style>
     :root{--bg:#d9dbe0;--paper:#ffffff;--ink:#2f3b4b;--muted:#6f7d90;--line:#e2e7ee;--pri:#5f9ed0}
     *{box-sizing:border-box}
-    html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+    html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
     .bg{position:fixed;inset:0;background:url('./sapporo-retro-main.jpg') center/cover no-repeat;filter:blur(18px) saturate(.85);opacity:.10;transform:scale(1.07);z-index:0;pointer-events:none}
-    .wrap{max-width:980px;margin:0 auto;padding:22px;position:relative;z-index:1}
+    .wrap{width:100%;max-width:980px;margin:0 auto;padding:22px;position:relative;z-index:1}
 
     .book{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(20,26,38,.18)}
 
@@ -28,16 +28,16 @@
 
     .btn{min-height:44px;border-radius:10px;border:1px solid var(--line);padding:10px 14px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer}
     .btn.pri{background:var(--pri);color:#fff;border-color:var(--pri)}
-    .nav{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+    .nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
 
     .spread{padding:14px;position:relative;overflow:hidden}
     .spread::before{content:'';position:absolute;inset:14px 50% 14px 50%;width:1px;background:linear-gradient(180deg,transparent,#dbe3ec 10%,#dbe3ec 90%,transparent);z-index:0}
     .spread-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative;z-index:1}
-    .page-left,.page-right{border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;min-height:560px}
+    .page-left,.page-right{border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;min-height:560px;min-width:0}
 
     .date{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-    .title{font-size:30px;line-height:1.1;margin:8px 0 10px;font-weight:800}
-    .body{font-size:16px;line-height:1.85;color:#3f5166;white-space:pre-line}
+    .title{font-size:30px;line-height:1.1;margin:8px 0 10px;font-weight:800;overflow-wrap:anywhere}
+    .body{font-size:16px;line-height:1.85;color:#3f5166;white-space:pre-line;overflow-wrap:anywhere}
     .body::first-letter{font-size:2.2em;float:left;line-height:.9;margin:.05em .08em 0 0;font-weight:800;color:#4b85b6}
 
     .hero-shot{width:100%;height:330px;border-radius:6px;object-fit:cover;border:1px solid #d9e4f0;background:#f0f5fb}
@@ -46,7 +46,7 @@
     .folio{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
 
     .meta-list{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
-    .meta-item{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f8fbff;font-size:13px;line-height:1.45;color:#3f5166}
+    .meta-item{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f8fbff;font-size:13px;line-height:1.45;color:#3f5166;overflow-wrap:anywhere}
     .meta-item strong{color:#2d4259}
 
     .food-panel{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
@@ -54,7 +54,7 @@
     .food-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
     .food-card{min-width:220px;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff}
     .food-card h4{margin:0 0 6px;font-size:14px}
-    .food-card p{margin:3px 0;font-size:12px;color:#586b80;line-height:1.4}
+    .food-card p{margin:3px 0;font-size:12px;color:#586b80;line-height:1.4;overflow-wrap:anywhere}
 
     .edit{margin-top:10px;font-size:12px;color:var(--muted)}
     .flip-next{animation:flipNext .35s ease}
@@ -65,7 +65,8 @@
     @keyframes flipPrev{0%{opacity:.65;transform:perspective(1200px) rotateY(16deg) translateX(8px)}100%{opacity:1;transform:perspective(1200px) rotateY(0) translateX(0)}}
 
     @media (max-width:860px){
-      .spread{padding:12px}
+      .wrap{padding:12px}
+      .spread{padding:10px}
       .spread::before{display:none}
       .spread-grid{grid-template-columns:1fr}
       .page-left,.page-right{min-height:auto}
