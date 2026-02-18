@@ -112,6 +112,14 @@ const hakodateFoods=[
 ];
 
 
+function resolveFlightInfo(metaText, page){
+  const m = metaText.match(/(KE\d{3})/i);
+  if(!m) return null;
+  const flight = m[1].toUpperCase();
+  const date = page?.date || '';
+  return `✈️ ${flight} · ${date}\n${metaText}`;
+}
+
 function resolveSpotIndex(metaText, page){
   const dict = [
     ['CTS','CTS'],['인천','Incheon'],['카이 포로토','KAI Poroto'],['아카렌카','Kanemori'],['치쿠바','Shinyotei'],
@@ -129,7 +137,11 @@ function resolveSpotIndex(metaText, page){
 
 function buildMetaHtml(page){
   return (page.meta||[]).map((x, idx)=>{
+    const flightInfo = resolveFlightInfo(x, page);
     const spotIdx = resolveSpotIndex(x, page);
+    if(flightInfo){
+      return `<li class="meta-item"><button class="meta-item-btn" data-flight-info="${encodeURIComponent(flightInfo)}"><strong>•</strong> ${x}<span class="hint">항공편 보기 ✈️</span></button></li>`;
+    }
     if(spotIdx >= 0){
       return `<li class="meta-item"><button class="meta-item-btn" data-spot-idx="${spotIdx}"><strong>•</strong> ${x}<span class="hint">지도 보기 ↗</span></button></li>`;
     }
@@ -147,6 +159,15 @@ function bindMetaActions(){
       m.openPopup();
       const mapBox = document.getElementById('map');
       if(mapBox) mapBox.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+
+  document.querySelectorAll('[data-flight-info]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const raw = el.getAttribute('data-flight-info');
+      if(!raw) return;
+      const info = decodeURIComponent(raw);
+      alert(info);
     });
   });
 }
