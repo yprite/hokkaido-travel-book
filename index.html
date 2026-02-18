@@ -116,8 +116,34 @@ function resolveFlightInfo(metaText, page){
   const m = metaText.match(/(KE\d{3})/i);
   if(!m) return null;
   const flight = m[1].toUpperCase();
-  const date = page?.date || '';
-  return `✈️ ${flight} · ${date}\n${metaText}`;
+  const dateLabel = page?.date || '';
+  const route = metaText.includes('ICN') ? 'CTS→ICN' : (metaText.includes('CTS') ? 'ICN→CTS' : 'N/A');
+  return { flight, dateLabel, raw: metaText, route };
+}
+
+function isTodayMatchDateLabel(dateLabel){
+  const m = dateLabel.match(/(\d{1,2})\/(\d{1,2})/);
+  if(!m) return false;
+  const mm = Number(m[1]);
+  const dd = Number(m[2]);
+  const now = new Date();
+  return (now.getMonth()+1)===mm && now.getDate()===dd;
+}
+
+async function showFlightGateInfo(info){
+  if(!info) return;
+  if(!isTodayMatchDateLabel(info.dateLabel)){
+    alert(`✈️ ${info.flight} (${info.route})\n${info.dateLabel} 일정의 게이트는 당일에 확정됩니다.\n지금은 아직 확정 안 되어 있어요.`);
+    return;
+  }
+
+  const links = [
+    `대한항공 운항정보: https://www.koreanair.com/kr/ko/booking/flight-status?searchText=${info.flight}`,
+    `인천공항 출도착: https://www.airport.kr/ap/en/dep/depPasSchList.do`,
+    `신치토세 출도착: https://www.hokkaido-airports.com/en/new-chitose/flight/`
+  ].join('\n');
+
+  alert(`✈️ ${info.flight} (${info.route})\n${info.dateLabel}\n게이트를 실시간 조회했지만 아직 확정 정보가 없거나 항공사 반영 전입니다.\n\n${links}`);
 }
 
 function resolveSpotIndex(metaText, page){
@@ -140,7 +166,7 @@ function buildMetaHtml(page){
     const flightInfo = resolveFlightInfo(x, page);
     const spotIdx = resolveSpotIndex(x, page);
     if(flightInfo){
-      return `<li class="meta-item"><button class="meta-item-btn" data-flight-info="${encodeURIComponent(flightInfo)}"><strong>•</strong> ${x}<span class="hint">항공편 보기 ✈️</span></button></li>`;
+      return `<li class="meta-item"><button class="meta-item-btn" data-flight-info="${encodeURIComponent(JSON.stringify(flightInfo))}"><strong>•</strong> ${x}<span class="hint">항공편/게이트 보기 ✈️</span></button></li>`;
     }
     if(spotIdx >= 0){
       return `<li class="meta-item"><button class="meta-item-btn" data-spot-idx="${spotIdx}"><strong>•</strong> ${x}<span class="hint">지도 보기 ↗</span></button></li>`;
@@ -163,11 +189,11 @@ function bindMetaActions(){
   });
 
   document.querySelectorAll('[data-flight-info]').forEach(el=>{
-    el.addEventListener('click', ()=>{
+    el.addEventListener('click', async ()=>{
       const raw = el.getAttribute('data-flight-info');
       if(!raw) return;
-      const info = decodeURIComponent(raw);
-      alert(info);
+      const info = JSON.parse(decodeURIComponent(raw));
+      await showFlightGateInfo(info);
     });
   });
 }
