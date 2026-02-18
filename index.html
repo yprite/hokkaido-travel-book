@@ -222,6 +222,51 @@ function editPage(){
   render();
 }
 
+
+function findRelatedMetaLines(spotName, page){
+  const keyMap = [
+    ['Incheon',['인천','ICN']],
+    ['CTS',['CTS','신치토세']],
+    ['KAI Poroto',['카이 포로토','포로토']],
+    ['Kanemori',['아카렌카','창고','Kanemori']],
+    ['Chikuba Shinyotei',['치쿠바','신요테이']],
+    ['Morning Market',['아침시장','차무']],
+    ['Goryokaku',['고료카쿠']],
+    ['Hachimanzaka',['하치만자카']],
+    ['Ropeway',['로프웨이']],
+    ['Hakodate',['하코다테']],
+    ['Noboribetsu Hanayura',['하나유라']],
+    ['Hanayura',['하나유라']],
+    ['Jigokudani',['지옥계곡']]
+  ];
+  const hit = keyMap.find(([token]) => spotName.includes(token));
+  if(!hit) return [];
+  const keys = hit[1];
+  return (page.meta||[]).filter(line => keys.some(k => line.includes(k))).slice(0,3);
+}
+
+function buildSpotPopup(page, spot, idx){
+  const related = findRelatedMetaLines(spot[0], page);
+  const nav = `https://www.google.com/maps/dir/?api=1&destination=${spot[1]},${spot[2]}&travelmode=driving`;
+  const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot[0])}`;
+  const street = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${spot[1]},${spot[2]}`;
+  const relatedHtml = related.length
+    ? `<ul style="margin:8px 0 0 16px;padding:0;font-size:12px;line-height:1.4;color:#334155">${related.map(v=>`<li>${v}</li>`).join('')}</ul>`
+    : `<div style="margin-top:8px;font-size:12px;color:#64748b">관련 일정 정보 없음</div>`;
+
+  return `
+    <div style="min-width:230px;max-width:280px">
+      <div style="font-weight:700;font-size:13px;color:#1f2937">${idx+1}. ${spot[0]}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px">${page.date} · ${page.title}</div>
+      ${relatedHtml}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        <a href="${nav}" target="_blank" style="padding:5px 8px;border-radius:999px;background:#2563eb;color:#fff;text-decoration:none;font-size:11px">네비</a>
+        <a href="${map}" target="_blank" style="padding:5px 8px;border-radius:999px;border:1px solid #cbd5e1;color:#1f2937;text-decoration:none;font-size:11px">지도</a>
+        <a href="${street}" target="_blank" style="padding:5px 8px;border-radius:999px;border:1px solid #cbd5e1;color:#1f2937;text-decoration:none;font-size:11px">스트리트뷰</a>
+      </div>
+    </div>`;
+}
+
 function drawMap(){
   if(map){map.remove();map=null;}
   markers=[];
@@ -231,7 +276,7 @@ function drawMap(){
   const ll=p.spots.map(s=>[s[1],s[2]]);
   p.spots.forEach((s,idx)=>{
     const icon=L.divIcon({className:'',html:`<div style="width:25px;height:25px;border-radius:50%;background:#5f9ed0;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 12px Inter">${idx+1}</div>`,iconSize:[25,25],iconAnchor:[12.5,12.5]});
-    const marker = L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(`<b>${idx+1}. ${s[0]}</b>`);
+    const marker = L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(buildSpotPopup(p, s, idx));
     markers.push(marker);
   });
   if(ll.length>1) L.polyline(ll,{color:'#5f9ed0',weight:4,opacity:.9}).addTo(map);
