@@ -48,6 +48,8 @@
     .meta-list{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
     .meta-item{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f8fbff;font-size:13px;line-height:1.45;color:#3f5166;overflow-wrap:anywhere}
     .meta-item strong{color:#2d4259}
+    .meta-item-btn{width:100%;text-align:left;border:0;background:transparent;color:inherit;padding:0;margin:0;font:inherit;cursor:pointer}
+    .meta-item-btn .hint{display:inline-block;margin-left:6px;font-size:11px;color:#5f9ed0}
 
     .food-panel{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
     .food-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
@@ -84,6 +86,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 let cover=true, i=0, dir='next', map=null;
+let markers=[];
 const swipe={x:0,y:0,dx:0,dy:0,a:false,lock:false};
 
 const pages=[
@@ -108,6 +111,46 @@ const hakodateFoods=[
   {name:'우니 무라카미',type:'우니동',time:'08:30~15:00',off:'수 휴무'}
 ];
 
+
+function resolveSpotIndex(metaText, page){
+  const dict = [
+    ['CTS','CTS'],['인천','Incheon'],['카이 포로토','KAI Poroto'],['아카렌카','Kanemori'],['치쿠바','Shinyotei'],
+    ['아침시장','Morning Market'],['고료카쿠','Goryokaku'],['하치만자카','Hachimanzaka'],['로프웨이','Ropeway'],
+    ['하코다테','Hakodate'],['하나유라','Hanayura'],['지옥계곡','Jigokudani']
+  ];
+  for(const [k, token] of dict){
+    if(metaText.includes(k)){
+      const idx = page.spots.findIndex(s => s[0].includes(token));
+      if(idx >= 0) return idx;
+    }
+  }
+  return -1;
+}
+
+function buildMetaHtml(page){
+  return (page.meta||[]).map((x, idx)=>{
+    const spotIdx = resolveSpotIndex(x, page);
+    if(spotIdx >= 0){
+      return `<li class="meta-item"><button class="meta-item-btn" data-spot-idx="${spotIdx}"><strong>•</strong> ${x}<span class="hint">지도 보기 ↗</span></button></li>`;
+    }
+    return `<li class="meta-item"><strong>•</strong> ${x}</li>`;
+  }).join('');
+}
+
+function bindMetaActions(){
+  document.querySelectorAll('[data-spot-idx]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.getAttribute('data-spot-idx'));
+      if(Number.isNaN(idx) || !markers[idx] || !map) return;
+      const m = markers[idx];
+      map.setView(m.getLatLng(), 13, {animate:true});
+      m.openPopup();
+      const mapBox = document.getElementById('map');
+      if(mapBox) mapBox.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+}
+
 function render(){
   document.getElementById('bg').style.display = cover ? 'none' : 'block';
   const el=document.getElementById('app');
@@ -116,13 +159,13 @@ function render(){
     return;
   }
   const p=pages[i];
-  const metaHtml=(p.meta||[]).map(x=>`<li class="meta-item"><strong>•</strong> ${x}</li>`).join('');
+  const metaHtml=buildMetaHtml(p);
   const foodHtml=hakodateFoods.map(f=>`<article class="food-card"><h4>${f.name}</h4><p>${f.type}</p><p>영업 ${f.time}</p><p>${f.off}</p></article>`).join('');
   const [leadLine, ...restLines] = (p.text || '').split('\n');
   const restText = restLines.join('\n');
   el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone" style="--panel-bg:url('${p.hero}')"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body"><div class="sublead">${leadLine||''}</div><div class="body-rest">${restText||''}</div></div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div></article><article class="page-right"><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
   bindSwipe();
-  setTimeout(drawMap,0);
+  setTimeout(()=>{ drawMap(); bindMetaActions(); },0);
 }
 
 function editPage(){
@@ -134,13 +177,15 @@ function editPage(){
 
 function drawMap(){
   if(map){map.remove();map=null;}
+  markers=[];
   const p=pages[i], m=document.getElementById('map'); if(!m) return;
   map=L.map(m,{zoomControl:true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
   const ll=p.spots.map(s=>[s[1],s[2]]);
   p.spots.forEach((s,idx)=>{
     const icon=L.divIcon({className:'',html:`<div style="width:25px;height:25px;border-radius:50%;background:#5f9ed0;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 12px Inter">${idx+1}</div>`,iconSize:[25,25],iconAnchor:[12.5,12.5]});
-    L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(`<b>${idx+1}. ${s[0]}</b>`);
+    const marker = L.marker([s[1],s[2]],{icon}).addTo(map).bindPopup(`<b>${idx+1}. ${s[0]}</b>`);
+    markers.push(marker);
   });
   if(ll.length>1) L.polyline(ll,{color:'#5f9ed0',weight:4,opacity:.9}).addTo(map);
   map.fitBounds(L.latLngBounds(ll),{padding:[20,20]});
