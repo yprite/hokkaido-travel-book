@@ -45,6 +45,17 @@
     .map{height:200px;border-radius:6px;overflow:hidden;border:1px solid #d7e3ef}
     .folio{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
 
+    .meta-list{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+    .meta-item{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f8fbff;font-size:13px;line-height:1.45;color:#3f5166}
+    .meta-item strong{color:#2d4259}
+
+    .food-panel{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+    .food-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+    .food-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+    .food-card{min-width:220px;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff}
+    .food-card h4{margin:0 0 6px;font-size:14px}
+    .food-card p{margin:3px 0;font-size:12px;color:#586b80;line-height:1.4}
+
     .edit{margin-top:10px;font-size:12px;color:var(--muted)}
     .flip-next{animation:flipNext .35s ease}
     .flip-prev{animation:flipPrev .35s ease}
@@ -73,32 +84,38 @@ let cover=true, i=0, dir='next', map=null;
 const swipe={x:0,y:0,dx:0,dy:0,a:false,lock:false};
 
 const pages=[
-  {date:'4/27 MON', title:'Sapporo Arrival Tone', text:`신치토세 도착 후 시라오이로 이동.
-첫 페이지는 속도를 낮추고,
-여행 리듬을 맞추는 데 집중한다.`, hero:'./sapporo-retro-main.jpg', spots:[['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
-  {date:'4/28 TUE', title:'Southbound to Hakodate', text:`긴 이동일은 욕심을 줄이고,
-휴식 지점을 먼저 확보한다.
-도착 후 저녁은 컨디션 기준으로 선택.`, hero:'./sapporo-retro-main.jpg', spots:[['KAI Poroto',42.5513,141.3577],['Kanemori',41.7674,140.7147],['Ryokan',41.7803,140.7875]]},
-  {date:'4/29 WED', title:'Hakodate Editorial Day', text:`아침시장, 고료카쿠, 카페, 야경.
-루트는 유지하되 체력에 맞춰 압축.
-가족 리듬이 가장 중요한 하루.`, hero:'./sapporo-retro-main.jpg', spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030]]},
-  {date:'4/30 THU', title:'Onsen Transfer Chapter', text:`하코다테에서 노보리베츠로 이동.
-관광보다 회복을 메인으로 두고,
-온천 중심의 느린 하루를 만든다.`, hero:'./sapporo-retro-main.jpg', spots:[['Uni Murakami',41.7733,140.7258],['Hanayura',42.4987,141.1446]]},
-  {date:'5/1 FRI', title:'Last Page Homebound', text:`지옥계곡을 짧게 보고 공항으로.
-이번 여정의 결론은 한 문장,
-무리 없이 함께 잘 다녀온 여행.`, hero:'./sapporo-retro-main.jpg', spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923]]}
+  {date:'4/27 MON', title:'인천 → CTS → 시라오이', text:`입국·렌트·체크인 중심의 첫날.
+동선을 짧게 잡고 료칸 디너로 마무리.`, hero:'./sapporo-retro-main.jpg', meta:['KE769 12:35-15:20','렌트카 픽업 15:30','호시노 리조트 카이 포로토 체크인 15:00+','저녁: 가이세키'], spots:[['Incheon',37.4602,126.4407],['CTS',42.7752,141.6923],['KAI Poroto',42.5513,141.3577]]},
+  {date:'4/28 TUE', title:'시라오이 → 하코다테', text:`장거리 이동일.
+휴게소 점심과 체크인 시간을 기준으로 여유 있게 이동.`, hero:'./sapporo-retro-main.jpg', meta:['아침: 호시노 리조트 일식','카이 포로토 체크아웃 12:00','이동 약 3~4시간','아카렌카 창고','치쿠바 신요테이 체크인 15:00+','저녁: 이이다야 또는 스키야키 아사리'], spots:[['KAI Poroto',42.5513,141.3577],['Kanemori Red Brick',41.7674,140.7147],['Chikuba Shinyotei',41.7803,140.7875]]},
+  {date:'4/29 WED', title:'하코다테 데이', text:`아침시장부터 야경까지 핵심 루트를 하루에 담되,
+컨디션에 따라 유연하게 축소 가능한 구성.`, hero:'./sapporo-retro-main.jpg', meta:['하코다테 아침시장 + 차무(카이센동)','고료카쿠 벚꽃','카페: 롯테카이/피베리','점심: 톤키 다이몬점 또는 타카하시(장어)','하치만자카 언덕','하코다테야마 로프웨이 야경','T/O: 럭키삐에로·하세가와 스토어','치쿠바 신요테이 연박'], spots:[['Morning Market',41.7736,140.7275],['Goryokaku',41.7968,140.7575],['Hachimanzaka',41.7657,140.7100],['Ropeway',41.7592,140.7030],['Shinyotei',41.7803,140.7875]]},
+  {date:'4/30 THU', title:'하코다테 → 노보리베츠', text:`아침 식사 후 이동,
+도착 후 온천/가이세키 중심으로 페이스 다운.`, hero:'./sapporo-retro-main.jpg', meta:['아침: 우니 무라카미 하코다테 본점','치쿠바 신요테이 체크아웃 11:00','이동 약 3시간','점심: 휴게소','노보리베츠 하나유라 체크인 14:00+','저녁: 가이세키'], spots:[['Hakodate',41.7688,140.7288],['Noboribetsu Hanayura',42.4987,141.1446]]},
+  {date:'5/1 FRI', title:'노보리베츠 → CTS → 인천', text:`귀국일.
+체크아웃 후 지옥계곡을 짧게 보고 공항 이동.`, hero:'./sapporo-retro-main.jpg', meta:['아침: 하나유라 일식','하나유라 체크아웃 10:00','노보리베츠 지옥계곡','공항 반납','KE766 CTS 15:05 → ICN 18:10'], spots:[['Hanayura',42.4987,141.1446],['Jigokudani',42.4973,141.1428],['CTS',42.7752,141.6923],['Incheon',37.4602,126.4407]]}
+];
+
+const hakodateFoods=[
+  {name:'이이다야',type:'징기스칸',time:'16:00~21:30',off:'목 휴무'},
+  {name:'스키야키 아사리 본점',type:'스키야키',time:'11:00~20:00',off:'수 휴무'},
+  {name:'차무',type:'카이센동',time:'07:00~14:00',off:'변동'},
+  {name:'톤키 다이몬점',type:'돈카츠',time:'11:00~20:30',off:'연중무휴'},
+  {name:'타카하시(장어도코로)',type:'장어덮밥',time:'11:30~14:30 / 17:00~21:00',off:'화 휴무'},
+  {name:'우니 무라카미',type:'우니동',time:'08:30~15:00',off:'수 휴무'}
 ];
 
 function render(){
   document.getElementById('bg').style.display = cover ? 'none' : 'block';
   const el=document.getElementById('app');
   if(cover){
-    el.innerHTML=`<section class="book cover-shell"><article class="cover-book"><img src="./sapporo-retro-main.jpg" alt="Sapporo editorial cover"/><div class="cover-body"><div class="kicker">Sapporo Visual Journal</div><h1>SAPPORO</h1><div class="sub">book-inspired editorial layout</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></article></section>`;
+    el.innerHTML=`<section class="book cover-shell"><article class="cover-book"><img src="./sapporo-retro-main.jpg" alt="Sapporo editorial cover"/><div class="cover-body"><div class="kicker">Sapporo Visual Journal</div><h1>SAPPORO</h1><div class="sub">전체 일정 + 동선 지도 + 하코다테 맛집 정보를 한눈에</div><div class="nav" style="grid-template-columns:1fr"><button class="btn pri" onclick="openBook()">책 펼치기</button></div></div></article></section>`;
     return;
   }
   const p=pages[i];
-  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body">${p.text}</div></div><div class="edit">텍스트 수정: 아래 버튼 사용</div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
+  const metaHtml=(p.meta||[]).map(x=>`<li class="meta-item"><strong>•</strong> ${x}</li>`).join('');
+  const foodHtml=hakodateFoods.map(f=>`<article class="food-card"><h4>${f.name}</h4><p>${f.type}</p><p>영업 ${f.time}</p><p>${f.off}</p></article>`).join('');
+  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body">${p.text}</div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div><div class="edit">텍스트 수정: 아래 버튼 사용</div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
   bindSwipe();
   setTimeout(drawMap,0);
 }
