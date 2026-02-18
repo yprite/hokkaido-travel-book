@@ -146,6 +146,39 @@ async function showFlightGateInfo(info){
   alert(`✈️ ${info.flight} (${info.route})\n${info.dateLabel}\n게이트를 실시간 조회했지만 아직 확정 정보가 없거나 항공사 반영 전입니다.\n\n${links}`);
 }
 
+
+function resolveCuisineInfo(metaText){
+  if(!metaText.includes('가이세키')) return null;
+  return {
+    name: '가이세키(懐石) 요리',
+    summary: '제철 식재료를 소량씩 순서대로 내는 일본 전통 코스 요리입니다.',
+    history: [
+      '기원은 다도(茶道)의 차회 음식(차카이세키)으로, 손님 접대용 간소한 식사에서 출발했습니다.',
+      '에도~메이지 시기에 연회·료테이 문화와 결합하며 오늘날의 코스 형태로 발전했습니다.',
+      '현대 가이세키는 계절감(旬), 그릇/플레이팅, 맛의 균형을 중시하는 “식문화 예술”로 여겨집니다.'
+    ],
+    points: ['전채 → 국물 → 회/구이/찜/튀김 → 식사 → 디저트 순으로 전개되는 경우가 많음', '맛뿐 아니라 온도·향·식감·색감의 흐름이 핵심', '료칸 가이세키는 지역 식재료(해산물/산채) 반영 비중이 큼']
+  };
+}
+
+function showCuisineInfo(metaText){
+  const c = resolveCuisineInfo(metaText);
+  if(!c) return;
+  const msg = [
+    `🍽 ${c.name}`,
+    '',
+    `• 설명: ${c.summary}`,
+    '',
+    '• 역사:',
+    ...c.history.map(v=>`  - ${v}`),
+    '',
+    '• 포인트:',
+    ...c.points.map(v=>`  - ${v}`)
+  ].join('
+');
+  alert(msg);
+}
+
 function resolveSpotIndex(metaText, page){
   const dict = [
     ['CTS','CTS'],['인천','Incheon'],['카이 포로토','KAI Poroto'],['아카렌카','Kanemori'],['치쿠바','Shinyotei'],
@@ -164,9 +197,13 @@ function resolveSpotIndex(metaText, page){
 function buildMetaHtml(page){
   return (page.meta||[]).map((x, idx)=>{
     const flightInfo = resolveFlightInfo(x, page);
+    const cuisineInfo = resolveCuisineInfo(x);
     const spotIdx = resolveSpotIndex(x, page);
     if(flightInfo){
       return `<li class="meta-item"><button class="meta-item-btn" data-flight-info="${encodeURIComponent(JSON.stringify(flightInfo))}"><strong>•</strong> ${x}<span class="hint">항공편/게이트 보기 ✈️</span></button></li>`;
+    }
+    if(cuisineInfo){
+      return `<li class="meta-item"><button class="meta-item-btn" data-cuisine="${encodeURIComponent(x)}"><strong>•</strong> ${x}<span class="hint">가이세키 정보 📖</span></button></li>`;
     }
     if(spotIdx >= 0){
       return `<li class="meta-item"><button class="meta-item-btn" data-spot-idx="${spotIdx}"><strong>•</strong> ${x}<span class="hint">지도 보기 ↗</span></button></li>`;
@@ -194,6 +231,14 @@ function bindMetaActions(){
       if(!raw) return;
       const info = JSON.parse(decodeURIComponent(raw));
       await showFlightGateInfo(info);
+    });
+  });
+
+  document.querySelectorAll('[data-cuisine]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const raw = el.getAttribute('data-cuisine');
+      if(!raw) return;
+      showCuisineInfo(decodeURIComponent(raw));
     });
   });
 }
