@@ -1,0 +1,9 @@
+{
+  "name": "훗카이도 남부 가족여행 플래너",
+  "short_name": "훗카이도여행",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0f172a",
+  "icons": []
+}
