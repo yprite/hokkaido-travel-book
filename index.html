@@ -13,7 +13,7 @@
     :root{--bg:#d9dbe0;--paper:#ffffff;--ink:#2f3b4b;--muted:#6f7d90;--line:#e2e7ee;--pri:#5f9ed0}
     *{box-sizing:border-box}
     html,body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
-    .bg{position:fixed;inset:0;background:url('./sapporo-retro-main.jpg') center/cover no-repeat;filter:blur(18px) saturate(.85);opacity:.10;transform:scale(1.07);z-index:0;pointer-events:none}
+    .bg{position:fixed;inset:0;background:linear-gradient(180deg,#d8dce2,#eceff4);z-index:0;pointer-events:none}
     .wrap{width:100%;max-width:980px;margin:0 auto;padding:22px;position:relative;z-index:1}
 
     .book{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(20,26,38,.18)}
@@ -31,6 +31,8 @@
     .nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
 
     .spread{padding:14px;position:relative;overflow:hidden}
+    .spread-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(16px) saturate(.85);transform:scale(1.08);opacity:.18;z-index:0;pointer-events:none}
+    .spread-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.86));z-index:0;pointer-events:none}
     .spread::before{content:'';position:absolute;inset:14px 50% 14px 50%;width:1px;background:linear-gradient(180deg,transparent,#dbe3ec 10%,#dbe3ec 90%,transparent);z-index:0}
     .spread-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative;z-index:1}
     .page-left,.page-right{border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff;min-height:560px;min-width:0}
@@ -41,7 +43,6 @@
     .sublead{font-size:22px;line-height:1.25;font-weight:700;color:#4b85b6;margin:0 0 8px}
     .body-rest{font-size:16px;line-height:1.82;color:#3f5166;white-space:pre-line}
 
-    .hero-shot{width:100%;height:330px;border-radius:6px;object-fit:cover;border:1px solid #d9e4f0;background:#f0f5fb}
     .map-label{margin:10px 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
     .map{height:200px;border-radius:6px;overflow:hidden;border:1px solid #d7e3ef}
     .folio{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
@@ -71,7 +72,6 @@
       .spread::before{display:none}
       .spread-grid{grid-template-columns:1fr}
       .page-left,.page-right{min-height:auto}
-      .hero-shot{height:240px}
     }
     @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
   </style>
@@ -119,7 +119,7 @@ function render(){
   const foodHtml=hakodateFoods.map(f=>`<article class="food-card"><h4>${f.name}</h4><p>${f.type}</p><p>영업 ${f.time}</p><p>${f.off}</p></article>`).join('');
   const [leadLine, ...restLines] = (p.text || '').split('\n');
   const restText = restLines.join('\n');
-  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body"><div class="sublead">${leadLine||''}</div><div class="body-rest">${restText||''}</div></div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
+  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-bg" style="background-image:url('${p.hero}')"></div><div class="spread-overlay"></div><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body"><div class="sublead">${leadLine||''}</div><div class="body-rest">${restText||''}</div></div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div></article><article class="page-right"><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
   bindSwipe();
   setTimeout(drawMap,0);
 }
