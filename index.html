@@ -13,6 +13,7 @@
     :root{--bg:#f3d4e7;--bg2:#f7e7d4;--paper:#fff8ef;--paper-edge:#f6e9dc;--line:#d7c7b7;--text:#1f2f45;--muted:#5c6f86;--pri:#c8302f;--sec:#2e7aa9}
     *{box-sizing:border-box}
     html,body{margin:0;background:radial-gradient(circle at 20% 0%,var(--bg),var(--bg2));color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");z-index:0}
     .wrap{max-width:900px;margin:0 auto;padding:16px;position:relative;z-index:1}
     .bg-cover-blur{position:fixed;inset:0;background-image:url('./theme-ref.jpg');background-size:cover;background-position:center;filter:blur(14px) saturate(.9);transform:scale(1.06);opacity:.28;z-index:0;pointer-events:none}
     .bg-cover-blur.hidden{display:none}
@@ -26,20 +27,24 @@
     .btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:11px 14px;font-size:14px;cursor:pointer;min-height:44px}
     .btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
     .btn:disabled{opacity:.45;cursor:not-allowed}
-    .page{padding:18px}
+    .page{padding:20px}
     .swipe-zone{border-radius:10px}
-    .date{font-size:13px;color:var(--muted);margin-bottom:8px}
-    .chapter{font-family:'Noto Serif KR',serif;font-size:22px;margin:0 0 8px}
-    .body{line-height:1.75;color:#2b3f5a;font-size:16px;white-space:pre-line}
-    .map{width:100%;height:250px;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0}
+    .date{font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.14em;text-transform:uppercase}
+    .chapter{font-family:'Noto Serif KR',serif;font-size:24px;line-height:1.25;margin:0 0 8px}
+    .body{line-height:1.78;color:#2b3f5a;font-size:16px;white-space:pre-line}
+    .body::first-letter{font-family:'Noto Serif KR',serif;font-size:2.4em;line-height:.9;float:left;margin:.06em .08em 0 0;color:#c8302f}
+    .map-wrap{margin:14px 0;padding:8px;background:#f8efe0;border:1px solid #d8c2a6;border-radius:14px;box-shadow:0 6px 18px rgba(120,87,48,.12)}
+    .map-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7a6654;margin:0 0 6px 2px}
+    .map{width:100%;height:250px;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0}
+    .tagline{display:inline-block;margin:0 0 8px;padding:4px 9px;border-radius:999px;border:1px solid #e2c7b0;background:#fff7ee;color:#8a4a30;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
     .edit-grid{display:grid;gap:8px;margin:8px 0}
     .input,.textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;color:var(--text)}
     .textarea{min-height:120px;resize:vertical;line-height:1.6}
     .details-wrap{margin-top:12px}
     .details-scroll{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;border-radius:12px}
     .details-scroll::-webkit-scrollbar{display:none}
-    .detail-card{min-width:100%;max-width:100%;border:1px dashed var(--line);border-radius:12px;padding:12px;background:#fffdf9;scroll-snap-align:start}
-    .detail-card h3{margin:0 0 8px;font-size:15px;color:#2b3f5a}
+    .detail-card{min-width:100%;max-width:100%;border:1px dashed var(--line);border-radius:12px;padding:14px;background:linear-gradient(180deg,#fffdf9,#fff7ee);scroll-snap-align:start;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+    .detail-card h3{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2b3f5a}
     .detail-card ul{margin:0;padding-left:20px}
     .detail-card li{margin:8px 0;line-height:1.5}
     .spot-row{padding:8px;border:1px solid var(--line);border-radius:10px;background:#fff}
@@ -265,6 +270,7 @@ function render(){
       <div class="page">
         <div id="swipe-zone" class="swipe-zone" aria-label="페이지 전환 제스처 영역">
           <div class="date">${page.date}</div>
+          <div class="tagline">Hokkaido Editorial Route</div>
           ${isEditing ? `
             <div class="edit-grid">
               <input id="edit-chapter" class="input" value="${page.chapter.replace(/"/g,'&quot;')}" />
@@ -277,7 +283,10 @@ function render(){
             <div class="body">${page.text}</div>
           `}
         </div>
-        <div id="map" class="map" aria-label="${page.date} 동선 지도"></div>
+        <div class="map-wrap">
+          <div class="map-title">Route Map · Day ${currentPage + 1}</div>
+          <div id="map" class="map" aria-label="${page.date} 동선 지도"></div>
+        </div>
         ${renderDetails(page)}
         <div class="small">${currentPage + 1} / ${pages.length} 페이지</div>
         <div class="book-nav">
