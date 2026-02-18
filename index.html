@@ -147,6 +147,42 @@ async function showFlightGateInfo(info){
 }
 
 
+
+function resolveRentalInfo(metaText){
+  const txt = metaText || '';
+  if(!(txt.includes('렌트') || txt.includes('반납') || txt.includes('렌트카'))) return null;
+  const isReturn = txt.includes('반납');
+  return {
+    type: isReturn ? '반납' : '픽업',
+    title: isReturn ? '렌트카 반납 안내' : '렌트카 픽업 안내',
+    summary: isReturn ? '공항 반납 시 주유 상태/시간 여유(최소 60~90분) 확보가 중요합니다.' : '공항 도착 후 렌트카 카운터 이동 → 계약 확인 → 차량 인수 순서로 진행됩니다.',
+    checklist: isReturn
+      ? ['⛽ 연료 규정 확인(Full to Full 권장)', '📸 반납 전 외관/주행거리 사진 기록', '🧾 반납 확인서(영수증) 수령']
+      : ['🪪 국제운전면허증 + 국내면허 + 여권 지참', '💳 운전자 본인 명의 카드 준비', '👶 카시트 예약 여부/장착 상태 확인'],
+    links: [
+      {label:'신치토세 렌트카 안내', url:'https://www.hokkaido-airports.com/en/new-chitose/service/rental-car/'},
+      {label:'인천공항 교통/주차', url:'https://www.airport.kr/ap/en/tpt/tptMain.do'}
+    ]
+  };
+}
+
+function showRentalInfo(metaText){
+  const r = resolveRentalInfo(metaText);
+  if(!r) return;
+  const msg = [
+    `🚗 ${r.title}`,
+    '',
+    `• ${r.summary}`,
+    '',
+    '• 체크리스트:',
+    ...r.checklist.map(v=>`  - ${v}`),
+    '',
+    '• 참고 링크:',
+    ...r.links.map(v=>`  - ${v.label}: ${v.url}`)
+  ].join('\n');
+  alert(msg);
+}
+
 function resolveCuisineInfo(metaText){
   if(!metaText.includes('가이세키')) return null;
   return {
@@ -196,10 +232,14 @@ function resolveSpotIndex(metaText, page){
 function buildMetaHtml(page){
   return (page.meta||[]).map((x, idx)=>{
     const flightInfo = resolveFlightInfo(x, page);
+    const rentalInfo = resolveRentalInfo(x);
     const cuisineInfo = resolveCuisineInfo(x);
     const spotIdx = resolveSpotIndex(x, page);
     if(flightInfo){
       return `<li class="meta-item"><button class="meta-item-btn" data-flight-info="${encodeURIComponent(JSON.stringify(flightInfo))}"><strong>•</strong> ${x}<span class="hint">항공편/게이트 보기 ✈️</span></button></li>`;
+    }
+    if(rentalInfo){
+      return `<li class="meta-item"><button class="meta-item-btn" data-rental="${encodeURIComponent(x)}"><strong>•</strong> ${x}<span class="hint">렌트카 안내 🚗</span></button></li>`;
     }
     if(cuisineInfo){
       return `<li class="meta-item"><button class="meta-item-btn" data-cuisine="${encodeURIComponent(x)}"><strong>•</strong> ${x}<span class="hint">가이세키 정보 📖</span></button></li>`;
@@ -238,6 +278,14 @@ function bindMetaActions(){
       const raw = el.getAttribute('data-cuisine');
       if(!raw) return;
       showCuisineInfo(decodeURIComponent(raw));
+    });
+  });
+
+  document.querySelectorAll('[data-rental]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const raw = el.getAttribute('data-rental');
+      if(!raw) return;
+      showRentalInfo(decodeURIComponent(raw));
     });
   });
 }
