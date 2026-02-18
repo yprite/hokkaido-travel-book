@@ -38,7 +38,8 @@
     .date{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
     .title{font-size:30px;line-height:1.1;margin:8px 0 10px;font-weight:800;overflow-wrap:anywhere}
     .body{font-size:16px;line-height:1.85;color:#3f5166;white-space:pre-line;overflow-wrap:anywhere}
-    .body::first-letter{font-size:2.2em;float:left;line-height:.9;margin:.05em .08em 0 0;font-weight:800;color:#4b85b6}
+    .sublead{font-size:22px;line-height:1.25;font-weight:700;color:#4b85b6;margin:0 0 8px}
+    .body-rest{font-size:16px;line-height:1.82;color:#3f5166;white-space:pre-line}
 
     .hero-shot{width:100%;height:330px;border-radius:6px;object-fit:cover;border:1px solid #d9e4f0;background:#f0f5fb}
     .map-label{margin:10px 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -116,7 +117,9 @@ function render(){
   const p=pages[i];
   const metaHtml=(p.meta||[]).map(x=>`<li class="meta-item"><strong>•</strong> ${x}</li>`).join('');
   const foodHtml=hakodateFoods.map(f=>`<article class="food-card"><h4>${f.name}</h4><p>${f.type}</p><p>영업 ${f.time}</p><p>${f.off}</p></article>`).join('');
-  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body">${p.text}</div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
+  const [leadLine, ...restLines] = (p.text || '').split('\n');
+  const restText = restLines.join('\n');
+  el.innerHTML=`<section class="book spread ${dir==='prev'?'flip-prev':'flip-next'}"><div class="spread-grid"><article class="page-left"><div id="swipe" class="swipe-zone"><div class="date">${p.date}</div><h2 class="title">${p.title}</h2><div class="body"><div class="sublead">${leadLine||''}</div><div class="body-rest">${restText||''}</div></div><ul class="meta-list">${metaHtml}</ul></div><div class="food-panel"><h3 class="food-title">Hakodate 맛집 리스트</h3><div class="food-scroll">${foodHtml}</div></div></article><article class="page-right"><img class="hero-shot" src="${p.hero}" alt="${p.title}"/><div class="map-label">Route Map</div><div id="map" class="map"></div><div class="folio"><span>${i+1} / ${pages.length}</span><span>Sapporo South</span></div></article></div><div class="nav"><button class="btn" onclick="${i===0?'goCover()':'prev()'}">${i===0?'← 표지':'← 이전'}</button><button class="btn" onclick="editPage()">제목/설명 수정</button><button class="btn pri" onclick="next()" ${i===pages.length-1?'disabled':''}>다음 →</button></div></section>`;
   bindSwipe();
   setTimeout(drawMap,0);
 }
